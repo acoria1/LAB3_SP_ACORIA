@@ -1,0 +1,44 @@
+{
+  "anuncios": [
+    {
+      "id": 1,
+      "titulo": "Ford Docus",
+      "transaccion": "Venta",
+      "descripcion": "Ford Docus",
+      "precio": 12345124,
+      "puertas": 1,
+      "kms": 2,
+      "potencia": 3
+    },
+    {
+      "id": 2,
+      "titulo": "BMW",
+      "transaccion": "Alquiler",
+      "descripcion": "BMW Gris customizable 0km",
+      "precio": 35700,
+      "puertas": 4,
+      "kms": 0,
+      "potencia": 450
+    },
+    {
+      "id": 3,
+      "titulo": "Volksvaguen GTH",
+      "transaccion": "Venta",
+      "descripcion": "Volksvaguen GTH Gris Cuatro Puertas, Alquiler",
+      "precio": 180,
+      "puertas": 4,
+      "kms": 1500,
+      "potencia": 390
+    },
+    {
+      "id": 4,
+      "titulo": "dqw123r42",
+      "transaccion": "Venta",
+      "descripcion": "dasdas",
+      "precio": 12341,
+      "puertas": 1,
+      "kms": 1,
+      "potencia": 1
+    }
+  ]
+}

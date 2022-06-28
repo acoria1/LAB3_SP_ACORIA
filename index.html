@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./scripts/app.js" defer type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="./css//styles.css">
+    <link rel="stylesheet" href="./server/node_modules/bootstrap/dist/css/bootstrap.css">
+    <title>Automoviles</title>
+</head>
+<body>
+    <header id="Header">
+        <nav>
+            <div class="container">                
+            <div class="row align-items-center justify-content-end">
+                <div class="col-md-2"><img src="./imagenes/car-logo.png" alt="Logo" /></div>
+                <div class="col-md-8 offset-md-2">
+                    <div class="row justify-content-end">
+                        <div class="col mb-sm-5 mt-5 mb-md-0 mb-lg-0 mt-lg-0"><a href="." class="text-decoration-none text-reset">Nosotros</a></div>
+                        <div class="col mb-sm-5 mt-5 mb-md-0 mb-lg-0 mt-lg-0"><a href="./principal.html" class="text-decoration-none text-reset">Principal</a></div>
+                        <div class="col mb-sm-5 mt-5 mb-md-0 mb-lg-0 mt-lg-0"><a href="." class="text-decoration-none text-reset">Administracion</a></div>
+                        <div class="col mt-5 mb-5 mb-lg-0 mt-lg-0" ><a href="." class="text-decoration-none text-reset">Contacto</a></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </nav>
+    </header>
+    <div id="principal">
+        <header class="header">
+            <h1>Administracion</h1>
+        </header>
+        <main class="main">
+            <section class="form-container">
+                <h2>Alta Anuncio</h2>
+                <form id="anuncios">
+                    <fieldset>
+                        <legend>Informacion Del Anuncio</legend>
+                    
+                    <div class="form-div">
+                        <label for="titulo">Titulo</label>
+                        <input type="text" name="txtTitulo" id="titulo" placeholder="Titulo" autocomplete="off" required>
+                    </div>
+                    <fieldset class="transaccion border p-2">
+                        <legend>Transacción</legend>
+                        <div class="form-fieldset-div">
+                            <label class="control-label input-label" for="transaccion">Venta</label>
+                            <input type="radio" name="transaccion" id="transaccion" value="Venta" checked>
+                        </div>
+                        <div class="form-fieldset-div">
+                            <label class="control-label input-label"for="transaccion">Alquiler</label>
+                            <input type="radio" name="transaccion" id="transaccion" value="Alquiler">
+                        </div>
+                    </fieldset >
+                    <div class="form-div">
+                        <label for="edad">Descripcion</label>
+                        <input type="text" name="txtDescripcion" id="descripcion" placeholder="Descripcion">
+                    </div>
+                    <div class="form-div">
+                        <label for="precio">Precio</label>
+                        <input type="number" name="precio" id="precio" placeholder="Precio" autocomplete="off" step="0.01" required>
+                        <small class="w-100" >Ingrese monto en usd</small>
+                    </div>
+                    <div class="form-div-icons">
+                        <img src="./imagenes/puerta.png" alt="icono1" class="icon"/>
+                        <input type="number" name="puertas" id="puertas" placeholder="Puertas" autocomplete="off" required min="0">
+                    </div>
+
+                    <div class="form-div-icons">
+                        <img src="./imagenes/kms.png" alt="icono1" class="icon"/>
+                        <input type="number" name="kms" id="kms" placeholder="KMs" autocomplete="off" required min="0">
+                    </div>
+
+                    <div class="form-div-icons">
+                        <img src="./imagenes/potencia.png" alt="icono1" class="icon"/>
+                        <input type="number" name="potencia" id="potencia" placeholder="Potencia" autocomplete="off" required min="0">
+                    </div>
+                    
+                    <input type="hidden" name="id" id="id" value="">
+                    <div class="form-div-buttons">
+                        <input id="btnAlta" class="button" type="submit" value="Alta Anuncio">
+                        <input id="btnModificar" class="btn btn-warning" type="submit" value="Guardar Cambios">
+                        <input id="btnEliminar" class="btn btn-danger" type="button" value="Eliminar Anuncio">
+                        <input id="btnCancelar" class="button" type="submit" value="Cancelar">
+                    </div>
+                </fieldset>                    
+                </form>
+            </section>
+            <section class="table-filters">
+                <h1>Filtros</h1>
+                <div class="container-filter-div">
+                    <div class="filter-div">
+                        <label for="transacciones">FILTRAR TRANSACCION</label>
+                        <input id="filtroTransacciones" list="transacciones">
+                        <datalist id="transacciones">
+                            <option value="Todos" />
+                            <option value="Alquiler" />
+                            <option value="Venta" />
+                        </datalist>
+                        <input id="btnFiltrar" class="button" type="button" value="Aplicar Filtro">
+                    </div>
+                    <div class="filter-div">
+                        <label for="txtPromedio">PROMEDIO</label>
+                        <input type="text" id="txtPromedio" name="promedio" disabled value="N/A">
+                    </div>
+                </div>
+            </section>         
+            <section class="table-selects">
+            </section>  
+            <section class="table-container">
+                        
+            </section>
+        </main>
+    </div>
+    <footer>
+        <nav>
+            <div class="container">                
+                <div class="row align-items-center justify-content-end">
+                    <div class="col-md-2"><img src="./imagenes/car-logo.png" alt="Logo" /></div>
+                    <div class="col-md-8 offset-md-2">
+                        <div class="row justify-content-end">
+                            <div class="col mb-sm-5 mt-5 mb-md-0 mb-lg-0 mt-lg-0"><a href="." class="text-decoration-none text-reset">Nosotros</a></div>
+                            <div class="col mb-sm-5 mt-5 mb-md-0 mb-lg-0 mt-lg-0"><a href="./principal.html" class="text-decoration-none text-reset">Principal</a></div>
+                            <div class="col mb-sm-5 mt-5 mb-md-0 mb-lg-0 mt-lg-0"><a href="." class="text-decoration-none text-reset">Administracion</a></div>
+                            <div class="col mt-5 mb-5 mb-lg-0 mt-lg-0" ><a href="." class="text-decoration-none text-reset">Contacto</a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-center">                    
+                    <div class="col"> <p> Todos los Derechos Reservados 2019 ©</p> </div>
+                </div>
+            </div>
+        </nav>
+    </footer>
+</body>
+</html>
