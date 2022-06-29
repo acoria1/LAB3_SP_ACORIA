@@ -1,7 +1,7 @@
 
 import { updateTable, addSelectColumnas} from './tablaDinamica.js';
 import { sortObjects } from './funcionesAdicionales.js';
-import {getAnuncios, getAnuncio,postAnuncio, deleteAnuncio, updateAnuncio, getAnunciosPorTipo, getAnunciosAjax, postAnuncioAjax, updateAnuncioAjax} from './anunciosAcceso.js';
+import {getAnuncios, getAnuncio,postAnuncio, deleteAnuncio, updateAnuncio, getAnunciosPorTipo, getAnunciosAjax, postAnuncioAjax, updateAnuncioAjax, cargarSpinner, eliminarSpinner} from './anunciosAcceso.js';
 import Anuncio_Auto from './anuncio.js';
 
 const URL_ANUNCIOS = "http://localhost:3000/anuncios";
@@ -9,123 +9,156 @@ const URL_SPINNER_GIF = "./imagenes/spinning-wheel.gif";
 const SPINNER_CONTAINER = ".table-container";
 
 
+initialize();
+
+function initialize(){
+    
+    const xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = ()=>{
+
+        if (xhr.readyState == 4){
+            //terminó la respuesta y completa
+            if (xhr.status >= 200 && xhr.status < 300){
+
+                let anuncios = JSON.parse(xhr.responseText);
+
+                //Create table
+                actualizarTablaAnuncios(anuncios,undefined,"sort-ascending");
+
+                //Add checkbox to filter columns
+                addSelectColumnas(document.querySelector('.table-selects'),anuncios);
+                
+                
+            $frmAnuncio.addEventListener("submit", (e) => {
+
+                e.preventDefault();
+
+                const anuncioDelForm = new Anuncio_Auto(
+                    $frmAnuncio.id.value, 
+                    $frmAnuncio.titulo.value,
+                    $frmAnuncio.transaccion.value,
+                    $frmAnuncio.descripcion.value,
+                    parseFloat($frmAnuncio.precio.value),
+                    parseInt($frmAnuncio.puertas.value),
+                    parseInt($frmAnuncio.kms.value),
+                    parseInt($frmAnuncio.potencia.value))
+
+                if (anuncioDelForm.id === "") {
+
+                    //add
+                    //postAnuncio(URL_ANUNCIOS, anuncioDelForm, SPINNER_CONTAINER, URL_SPINNER_GIF);
+                    postAnuncioAjax(URL_ANUNCIOS, anuncioDelForm, SPINNER_CONTAINER, URL_SPINNER_GIF);
+
+
+                } else {
+                    //update
+                    //updateAnuncio(URL_ANUNCIOS,anuncioDelForm,SPINNER_CONTAINER,URL_SPINNER_GIF);
+                    updateAnuncioAjax(URL_ANUNCIOS,anuncioDelForm,SPINNER_CONTAINER,URL_SPINNER_GIF);
+                    //
+                }
+            })
+
+
+
+            window.addEventListener("click", async (e) => {
+                if (e.target.matches("tr td")) {
+                    
+                    let currentID = e.target.parentElement.dataset.id;
+
+                    const anuncioSeleccionado = anuncios.find((anuncio) => anuncio.id == currentID);
+
+                    //load selected row into form
+                    loadForm(anuncioSeleccionado, $frmAnuncio);
+
+                    setFormModificar();
+
+                    //scroll to form
+                    document.getElementById('anuncios').scrollIntoView();
+
+                } else if (e.target.matches("#btnCancelar")){
+
+                    setFormAlta();
+
+                } else if(e.target.matches("#btnEliminar")){
+
+                    deleteAnuncio(URL_ANUNCIOS,$frmAnuncio.id.value,SPINNER_CONTAINER,URL_SPINNER_GIF);
+
+                } else if (e.target.matches('.table-checkbox')){
+                    let columna = e.target.value;
+                    //FILTRAR COLUMNAS
+                    if(!e.target.checked){
+
+                        //QUITAR COLUMNA
+                        columnasOcultas.push(columna);
+                        anuncios = filtrarColumnasEnTable(anuncios,columnasOcultas);
+
+                        actualizarTablaAnuncios(anuncios);
+
+                    } else {
+
+                        //AGREGAR COLUMNA
+                        let index = columnasOcultas.indexOf(columna);
+                        columnasOcultas.splice(index, 1);
+                        anuncios = await getAnuncios(URL_ANUNCIOS, SPINNER_CONTAINER, URL_SPINNER_GIF);
+
+                        anuncios = filtrarColumnasEnTable(anuncios,columnasOcultas);
+
+                        actualizarTablaAnuncios(anuncios);
+
+                    }
+                } else if (e.target.matches('#btnFiltrar')) {
+                    //
+                    let filtrarPor = document.getElementById("filtroTransacciones").value;
+
+                    //get por tipo
+                    anuncios = await getAnunciosPorTipo(URL_ANUNCIOS, SPINNER_CONTAINER, URL_SPINNER_GIF, filtrarPor);
+
+                    //volver a aplicar filtros de columnas
+                    anuncios = filtrarColumnasEnTable(anuncios,columnasOcultas);
+
+                    //actualizar tabla
+                    actualizarTablaAnuncios(anuncios);
+                    
+                    //Get textbox de promedio:
+                    txtPromedio = document.getElementById('txtPromedio');
+
+                    //calcular y mostrar promedio
+                    if(filtrarPor == 'Alquiler' || filtrarPor == 'Venta'){
+                        let avgPrecio = calcularPromedio(anuncios);
+                        txtPromedio.value = avgPrecio;
+                    } else {
+                        txtPromedio.value = "N/A";
+                    }        
+                }
+            })
+
+
+            } else {
+                
+                console.error(xhr.status, xhr.statusText);
+                eliminarSpinner(SPINNER_CONTAINER);
+            }
+
+        } else {
+            //todavía no terminó la respuesta
+            cargarSpinner(SPINNER_CONTAINER, URL_SPINNER_GIF);       
+            
+        }
+    };
+
+    xhr.open("GET",URL_ANUNCIOS);
+
+    xhr.send();
+}
+
 // Initialize Form
 const $frmAnuncio = document.forms[0];
 setFormAlta();
-
-let anuncios = await getAnuncios(URL_ANUNCIOS, SPINNER_CONTAINER, URL_SPINNER_GIF);
 const columnasOcultas = [];
 
-//Create table
-actualizarTablaAnuncios(anuncios,undefined,"sort-ascending");
-
-//Add checkbox to filter columns
-addSelectColumnas(document.querySelector('.table-selects'),anuncios);
 
 
-$frmAnuncio.addEventListener("submit", (e) => {
-
-    e.preventDefault();
-
-    const anuncioDelForm = new Anuncio_Auto(
-        $frmAnuncio.id.value, 
-        $frmAnuncio.titulo.value,
-        $frmAnuncio.transaccion.value,
-        $frmAnuncio.descripcion.value,
-        parseFloat($frmAnuncio.precio.value),
-        parseInt($frmAnuncio.puertas.value),
-        parseInt($frmAnuncio.kms.value),
-        parseInt($frmAnuncio.potencia.value))
-
-    if (anuncioDelForm.id === "") {
-
-        //add
-        //postAnuncio(URL_ANUNCIOS, anuncioDelForm, SPINNER_CONTAINER, URL_SPINNER_GIF);
-        postAnuncioAjax(URL_ANUNCIOS, anuncioDelForm, SPINNER_CONTAINER, URL_SPINNER_GIF);
-
-
-    } else {
-        //update
-        //updateAnuncio(URL_ANUNCIOS,anuncioDelForm,SPINNER_CONTAINER,URL_SPINNER_GIF);
-        updateAnuncioAjax(URL_ANUNCIOS,anuncioDelForm,SPINNER_CONTAINER,URL_SPINNER_GIF);
-        //
-    }
-})
-
-
-
-window.addEventListener("click", async (e) => {
-    if (e.target.matches("tr td")) {
-        
-        let currentID = e.target.parentElement.dataset.id;
-
-        const anuncioSeleccionado = anuncios.find((anuncio) => anuncio.id == currentID);
-
-        //load selected row into form
-        loadForm(anuncioSeleccionado, $frmAnuncio);
-
-        setFormModificar();
-
-        //scroll to form
-        document.getElementById('anuncios').scrollIntoView();
-
-    } else if (e.target.matches("#btnCancelar")){
-
-        setFormAlta();
-
-    } else if(e.target.matches("#btnEliminar")){
-
-        //handlerDelete(parseInt($frmAnuncio.id.value), anuncios, "anuncios");
-        deleteAnuncio(URL_ANUNCIOS,$frmAnuncio.id.value,SPINNER_CONTAINER,URL_SPINNER_GIF);
-
-    } else if (e.target.matches('.table-checkbox')){
-        let columna = e.target.value;
-        //FILTRAR COLUMNAS
-        if(!e.target.checked){
-
-            //QUITAR COLUMNA
-            columnasOcultas.push(columna);
-            anuncios = filtrarColumnasEnTable(anuncios,columnasOcultas);
-
-            actualizarTablaAnuncios(anuncios);
-
-        } else {
-
-            //AGREGAR COLUMNA
-            let index = columnasOcultas.indexOf(columna);
-            columnasOcultas.splice(index, 1);
-            anuncios = await getAnuncios(URL_ANUNCIOS, SPINNER_CONTAINER, URL_SPINNER_GIF);
-
-            anuncios = filtrarColumnasEnTable(anuncios,columnasOcultas);
-
-            actualizarTablaAnuncios(anuncios);
-
-        }
-    } else if (e.target.matches('#btnFiltrar')) {
-        //
-        let filtrarPor = document.getElementById("filtroTransacciones").value;
-
-        //get por tipo
-        anuncios = await getAnunciosPorTipo(URL_ANUNCIOS, SPINNER_CONTAINER, URL_SPINNER_GIF, filtrarPor);
-
-        //volver a aplicar filtros de columnas
-        anuncios = filtrarColumnasEnTable(anuncios,columnasOcultas);
-
-        //actualizar tabla
-        actualizarTablaAnuncios(anuncios);
-        
-        //Get textbox de promedio:
-        txtPromedio = document.getElementById('txtPromedio');
-
-        //calcular y mostrar promedio
-        if(filtrarPor == 'Alquiler' || filtrarPor == 'Venta'){
-            let avgPrecio = calcularPromedio(anuncios);
-            txtPromedio.value = avgPrecio;
-        } else {
-            txtPromedio.value = "N/A";
-        }        
-    }
-})
 
 function calcularPromedio(anuncios) {
     return anuncios.reduce((avg, anuncio, _, { length }) => {
@@ -175,6 +208,7 @@ function actualizarTablaAnuncios(anuncios, sortStates, defaultSortState = "sort-
     while ($container.children.length > 0) {
         $container.removeChild($container.firstElementChild);
     }
+
 
     const $tablaAnuncios = updateTable(".table-container", anuncios);
 

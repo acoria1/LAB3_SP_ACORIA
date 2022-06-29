@@ -1,5 +1,5 @@
 
-const cargarSpinner = (container, image)=> {
+function cargarSpinner (container, image){
     const $spinnerContainer = document.querySelector(container);
 
     const spinner  = document.createElement('img');
@@ -9,7 +9,7 @@ const cargarSpinner = (container, image)=> {
     $spinnerContainer.appendChild(spinner);    
 }
 
-const eliminarSpinner = (container) => {
+function  eliminarSpinner(container){
     const $spinnerContainer = document.querySelector(container);
     while($spinnerContainer.hasChildNodes()){
         $spinnerContainer.removeChild($spinnerContainer.firstChild);
@@ -214,6 +214,5 @@ const updateAnuncioAjax = (url, anuncio, spinnerContainer, spinnerImageUrl) => {
     xhr.send(JSON.stringify(anuncio));
 }
 
-
 export {getAnuncios, getAnuncio,postAnuncio, deleteAnuncio, updateAnuncio, getAnunciosPorTipo, getAnunciosAjax,
-    postAnuncioAjax, updateAnuncioAjax};
+    postAnuncioAjax, updateAnuncioAjax, cargarSpinner, eliminarSpinner};
